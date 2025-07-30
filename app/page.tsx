@@ -27,6 +27,7 @@ export default function Game() {
   const [opponentChoice, setOpponentChoice] = useState('');
   const [result, setResult] = useState('');
   const [roomFull, setRoomFull] = useState(false);
+  const [disabledChoice, setDisabledChoice] = useState(false);
 
   useEffect(() => {
     socket = io({
@@ -52,6 +53,13 @@ export default function Game() {
       } else {
         setResult('You Lose!');
       }
+
+      setTimeout(() => {
+        setChoice('');
+        setOpponentChoice('');
+        setResult('');
+        setDisabledChoice(false);
+      }, 2000);
     });
 
     socket.on('roomFull', () => {
@@ -72,9 +80,12 @@ export default function Game() {
   };
 
   const selectChoice = (opt: string) => {
+    if (disabledChoice) return;
     setChoice(opt);
+    setDisabledChoice(true);
     socket.emit('makeChoice', { roomId, choice: opt });
   };
+
 
   return (
     <main className="p-6 bg-gray-100 min-h-screen text-center text-black">
@@ -116,7 +127,9 @@ export default function Game() {
               <button
                 key={opt}
                 onClick={() => selectChoice(opt)}
-                className="bg-white p-3 rounded shadow hover:scale-105 transition"
+                disabled={disabledChoice}
+                className={`bg-white p-3 rounded shadow transition ${disabledChoice ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
+                  }`}
               >
                 <Image src={`/images/${opt}.png`} alt={opt} width={20} height={20} className="mx-auto" />
                 <p className="capitalize mt-1 font-medium">{opt}</p>

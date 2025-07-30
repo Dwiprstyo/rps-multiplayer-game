@@ -78,7 +78,16 @@ export default function Game() {
     });
 
     channel.subscribe('result', (msg: Message) => {
-      setResult(msg.data);
+      const { clientId: targetId, outcome, choices } = msg.data;
+
+      if (targetId === ably.auth.clientId) {
+        setResult(outcome);
+
+        const opponentId = Object.keys(choices).find(id => id !== ably.auth.clientId);
+        if (opponentId) {
+          setOpponentChoice(choices[opponentId]);
+        }
+      }
     });
 
   };
@@ -110,22 +119,27 @@ export default function Game() {
       if (data?.choice) choices[m.clientId!] = data.choice;
     });
 
-    if (Object.keys(choices).length === 2) {
-      const [id1, id2] = Object.keys(choices);
-      const c1 = choices[id1];
-      const c2 = choices[id2];
+    if (Object.keys(choices).length === 2) { 
+      await Promise.all(Object.keys(choices).map(async (id) => {
+        let outcome: string;
+        const c1 = choices[id];
+        const opponentId = Object.keys(choices).find(k => k !== id)!;
+        const c2 = choices[opponentId];
 
-      let outcome: string;
+        if (c1 === c2) {
+          outcome = 'Draw';
+        } else if (Rules[c1]?.includes(c2)) {
+          outcome = 'You Win!';
+        } else {
+          outcome = 'You Lose!';
+        }
 
-      if (c1 === c2) {
-        outcome = 'Draw';
-      } else if (Rules[c1]?.includes(c2)) {
-        outcome = id1 === ably.auth.clientId ? 'You Win!' : 'You Lose!';
-      } else {
-        outcome = id2 === ably.auth.clientId ? 'You Win!' : 'You Lose!';
-      }
-
-      await channel.publish('result', outcome);
+        await channel.publish('result', {
+          clientId: id,
+          outcome,
+          choices
+        });
+      }));
       await channel.presence.update({});
     }
 
@@ -220,14 +234,19 @@ export default function Game() {
             )}
             {result && (
               <div className="mt-4 space-y-2">
+                <p className="text-2xl font-bold">{result}</p>
                 <button
                   onClick={resetGame}
                   className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 >
                   Play Again
                 </button>
-                {disabledChoice && !opponentReady && (
-                  <p className="text-gray-500 italic">Waiting for opponent to press `Play Again`...</p>
+                {disabledChoice && (
+                  opponentReady ? (
+                    <p className="text-green-600 italic">Opponent is ready</p>
+                  ) : (
+                    <p className="text-gray-500 italic">Waiting for opponent to press `Play Again`...</p>
+                  )
                 )}
               </div>
             )}

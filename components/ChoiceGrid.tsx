@@ -16,7 +16,7 @@ export default function ChoiceGrid({ options, disabled, onSelect }: Props) {
           disabled={disabled}
           className={`bg-white p-3 rounded shadow transition ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'}`}
         >
-          <Image src={`/images/${opt}.png`} alt={opt} width={50} height={50}className="mx-auto" />
+          <Image src={`/images/choice/${opt}.png`} alt={opt} width={50} height={50}className="mx-auto" />
           <p className="capitalize mt-1 font-medium">{opt}</p>
         </button>
       ))}

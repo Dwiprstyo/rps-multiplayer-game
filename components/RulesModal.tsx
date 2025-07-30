@@ -31,7 +31,7 @@ export default function RulesModal({ visible, onClose }: Props) {
               <li>Pick your move by clicking an icon.</li>
               <li>Wait for your opponent to pick theirs.</li>
               <li>The result is shown once both have chosen.</li>
-              <li>Press "Play Again" to play the next round.</li>
+              <li>Press `Play Again` play the next round.</li>
             </ul>
             <div className="text-center">
               <button

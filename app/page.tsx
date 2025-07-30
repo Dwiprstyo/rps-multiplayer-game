@@ -148,7 +148,7 @@ export default function Game() {
       setDisabledChoice(false);
     }
   };
-
+  
   return (
     <main className="p-6 bg-gray-100 min-h-screen text-center text-black">
       <Header />
@@ -176,6 +176,7 @@ export default function Game() {
           />
         </>
       )}
+      <p className="fixed bottom-2 right-2 text-xs text-gray-500">{clientId}</p>
     </main>
   );
 }

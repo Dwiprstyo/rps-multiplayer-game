@@ -149,7 +149,6 @@ export default function Game() {
     setChoice('');
     setOpponentChoice('');
     setResult('');
-    setDisabledChoice(false);
     setOpponentReady(false);
 
     // Menandakan pemain ini siap
@@ -165,6 +164,8 @@ export default function Game() {
       // reset game untuk semua
       await channel.publish('reset', {});
       await channel.presence.update({}); // clear playAgain
+
+      setDisabledChoice(false);
     }
   };
 
@@ -208,7 +209,7 @@ export default function Game() {
               <button
                 key={opt}
                 onClick={() => selectChoice(opt)}
-                disabled={disabledChoice}
+                disabled={disabledChoice || !!result}
                 className={`bg-white p-3 rounded shadow transition ${disabledChoice ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'
                   }`}
               >

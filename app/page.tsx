@@ -27,6 +27,8 @@ export default function Game() {
   const [clientId, setClientId] = useState("");
   const [opponentReady, setOpponentReady] = useState(false);
   const [showRules, setShowRules] = useState(false);
+  const [score, setScore] = useState(0);
+  const [opponentScore, setOpponentScore] = useState(0);
 
   useEffect(() => {
     const randomId = `user-${Math.floor(Math.random() * 10000)}`;
@@ -87,6 +89,9 @@ export default function Game() {
           (id) => id !== ably.auth.clientId
         );
         if (opponentId) setOpponentChoice(choices[opponentId]);
+
+        if (outcome === "You Win!") setScore((prev) => prev + 1);
+        else if (outcome === "You Lose!") setOpponentScore((prev) => prev + 1);
       }
     });
   };
@@ -160,7 +165,10 @@ export default function Game() {
       ) : (
         <>
           <p className="mb-2">Players in room: {players.length}</p>
-          <p className="mb-2">Room code: {roomId}</p>
+          <p className="text-lg font-semibold my-2">
+            Score: <span className="text-green-600">{score}</span> - <span className="text-red-600">{opponentScore}</span>
+          </p>
+          <p className="fixed bottom-2 left-2 text-xs text-gray-500">room-{roomId}</p>
           <ChoiceGrid
             options={options}
             disabled={disabledChoice || !!result}

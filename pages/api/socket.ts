@@ -22,8 +22,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
         res.end();
         return;
     }
-
-    console.log('Starting Socket.IO server...');
     const io = new IOServer(res.socket.server, {
         path: '/api/socket',
     });
@@ -32,7 +30,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponseWithSoc
     const rooms: Record<string, { players: string[]; choices: Record<string, string> }> = {};
 
     io.on('connection', socket => {
-        console.log('User connected:', socket.id);
 
         socket.on('joinRoom', ({ roomId }) => {
             rooms[roomId] = rooms[roomId] || { players: [], choices: {} };
